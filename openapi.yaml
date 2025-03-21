@@ -1,0 +1,81 @@
+openapi: 3.0.1
+info:
+  title: Movie Info API
+  description: API to retrieve movie information from external data sources
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+paths:
+  /movies/{movieTitle}:
+    get:
+      summary: Get movie info based on search term
+      parameters:
+        - name: movieTitle
+          in: path
+          required: true
+          description: Title of the movie
+          schema:
+            type: string
+        - name: api
+          in: query
+          required: true
+          description: Name of the external API data source
+          schema:
+            type: string
+            enum:
+              - OMDB_API
+              - THE_MOVIE_DB
+      responses:
+        '200':
+          description: Successful response containing movie information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieInfoDTO'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailDTO'
+        '404':
+          description: Movie not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailDTO'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetailDTO'
+components:
+  schemas:
+    MovieInfoDTO:
+      type: object
+      properties:
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieDTO'
+    MovieDTO:
+      type: object
+      properties:
+        Title:
+          type: string
+          description: Movie title
+        Year:
+          type: string
+          description: Release year
+        Director:
+          type: array
+          description: List of directors
+          items:
+            type: string
+    ErrorDetailDTO:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
